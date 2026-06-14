@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHOST — Calculateurs</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e2d47;
+    --border2: #263548;
+    --blue: #1d4ed8;
+    --blue2: #2563eb;
+    --blue3: #3b82f6;
+    --blue-glow: rgba(37,99,235,0.15);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #4b6080;
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --mono: 'Courier New', monospace;
+    --sans: system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  /* HEADER */
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo { width: 32px; height: 32px; background: var(--blue2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: #fff; letter-spacing: -1px; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+  .logo-text span { color: var(--blue3); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .tab {
+    padding: 12px 20px; font-size: 13px; font-weight: 500; cursor: pointer;
+    color: var(--text2); border-bottom: 2px solid transparent; transition: all .2s;
+    letter-spacing: .5px;
+  }
+  .tab.active { color: var(--blue3); border-bottom-color: var(--blue3); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* PANELS */
+  .panel { display: none; padding: 28px 24px; max-width: 680px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px; margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--blue3); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); }
+  input, select {
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 8px;
+    padding: 10px 12px; color: var(--text); font-size: 14px; font-family: var(--mono);
+    outline: none; transition: border-color .2s;
+    width: 100%;
+  }
+  input:focus, select:focus { border-color: var(--blue2); }
+  select option { background: var(--surface); }
+
+  /* BTN */
+  .btn {
+    width: 100%; padding: 12px; margin-top: 18px;
+    background: var(--blue2); color: #fff; border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn:hover { background: var(--blue3); }
+
+  /* RESULT */
+  .result-box {
+    margin-top: 20px; padding: 16px 20px;
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 10px;
+    display: none;
+  }
+  .result-box.show { display: block; }
+  .result-main { font-size: 28px; font-weight: 700; font-family: var(--mono); color: var(--blue3); }
+  .result-label { font-size: 11px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .result-item { background: var(--surface2); border-radius: 8px; padding: 12px; }
+  .result-item .val { font-family: var(--mono); font-size: 15px; font-weight: 600; }
+  .result-item .lbl { font-size: 10px; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .rr-good { color: var(--green); }
+  .rr-bad { color: var(--red); }
+  .rr-ok { color: var(--amber); }
+
+  /* CONSISTENCY CHECKER (Gold) */
+  .consist-box {
+    margin-top: 16px; border-radius: 10px; padding: 14px 18px;
+    font-size: 13px; font-weight: 500;
+    display: none;
+  }
+  .consist-box.show { display: block; }
+  .consist-ok { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: var(--green); }
+  .consist-warn { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: var(--amber); }
+  .consist-bad { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: var(--red); }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 18px; }
+
+  /* PLAN SELECTOR */
+  .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .plan-btn {
+    padding: 10px; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px;
+    cursor: pointer; text-align: center; transition: all .2s; color: var(--text2);
+  }
+  .plan-btn.selected { border-color: var(--blue2); background: var(--blue-glow); color: var(--blue3); }
+  .plan-btn .plan-name { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .plan-btn .plan-cap { font-size: 10px; margin-top: 2px; }
+
+  @media(max-width:480px){
+    .form-grid { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+    .plan-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">G</div>
+  <div class="logo-text">GHOST<span>RAD</span></div>
+</div>
+
+
+
+<!-- ====== FOREX ====== -->
+<div class="panel active" id="panel-forex">
+  <div class="card">
+    <div class="card-title">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Calculateur de Position — Forex
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Capital ($)</label>
+        <input type="number" id="fx-capital" value="10000" min="0" step="100">
+      </div>
+      <div class="form-group">
+        <label>Risque (%)</label>
+        <input type="number" id="fx-risk" value="1" min="0.01" max="100" step="0.1">
+      </div>
+      <div class="form-group full">
+        <label>Paire</label>
+        <select id="fx-pair">
+          <option>AUD/USD</option><option>EUR/USD</option><option>GBP/USD</option>
+          <option>USD/CAD</option><option>AUD/CAD</option><option>EUR/AUD</option>
+          <option>EUR/CAD</option><option>EUR/GBP</option><option>GBP/AUD</option>
+          <option>GBP/CAD</option><option>AUD/NZD</option><option>EUR/NZD</option>
+          <option>GBP/NZD</option><option>NZD/CAD</option><option>NZD/USD</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Stop Loss (pips)</label>
+        <input type="number" id="fx-sl" value="20" min="0.1" step="0.5">
+      </div>
+    </div>
+
+    <button class="btn" onclick="calcForex()">CALCULER</button>
+
+    <div class="result-box" id="fx-result">
+      <div class="result-label">Taille de position</div>
+      <div class="result-main" id="fx-lots">— lots</div>
+      <div class="result-grid" style="grid-template-columns:1fr;">
+        <div class="result-item">
+          <div class="val" id="fx-risk-val">—</div>
+          <div class="lbl">Risque $</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ========== FOREX ==========
+const PIP_VALUE = {
+  'AUD/USD':10,'EUR/USD':10,'GBP/USD':10,'NZD/USD':10,
+  'USD/CAD':10,'AUD/CAD':10,'EUR/AUD':10,'EUR/CAD':10,
+  'EUR/GBP':10,'GBP/AUD':10,'GBP/CAD':10,'AUD/NZD':10,
+  'EUR/NZD':10,'GBP/NZD':10,'NZD/CAD':10
+};
+
+function calcForex() {
+  const capital = parseFloat(document.getElementById('fx-capital').value);
+  const risk = parseFloat(document.getElementById('fx-risk').value) / 100;
+  const sl = parseFloat(document.getElementById('fx-sl').value);
+  const pair = document.getElementById('fx-pair').value;
+
+  if (!capital || !risk || !sl) return;
+
+  const riskAmount = capital * risk;
+  const pipVal = PIP_VALUE[pair] || 10;
+  const lots = riskAmount / (sl * pipVal);
+
+  document.getElementById('fx-lots').textContent = lots.toFixed(2) + ' lots';
+  document.getElementById('fx-risk-val').textContent = '$' + riskAmount.toFixed(0);
+
+  document.getElementById('fx-result').classList.add('show');
+}
+
+// Recalcul auto
+['fx-capital','fx-risk','fx-sl'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => {
+    if (document.getElementById('fx-result').classList.contains('show')) calcForex();
+  })
+);
+</script>
+</body>
+</html>
